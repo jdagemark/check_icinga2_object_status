@@ -1,22 +1,24 @@
 #!/bin/bash
 #
-# Icinga2/Nagios plugin to check status of a host or service monitoredd
-# by Icinga2 using the I2API.
+# Icinga2 plugin to check status of a host or service on another
+# Icinga2 server using the Icinga2 API.
 #
 # Copyright (c) 2023 Dagemark Innovation AB
 # Author: Johannes Dagemark <johannes@dagemark.com>
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# check_icinga2_object is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
+# check_icinga2_object is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with check_icinga2_object-exporter.  If not, see <http://www.gnu.org/licenses/>.
+#
 #
 
 print_usage() {
