@@ -1,0 +1,154 @@
+#!/bin/bash
+#
+# Icinga2/Nagios plugin to check status of a host or service monitoredd
+# by Icinga2 using the I2API.
+#
+# Copyright (c) 2023 Dagemark Innovation AB
+# Author: Johannes Dagemark <johannes@dagemark.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+print_usage() {
+	echo ""
+	echo "Usage: check_icinga2_object.sh --api <icinga2_api_url> --user <apiuser:apipassword> \\"
+	echo "                               -H | --hostname <host.name> --service <service.name>" 
+	echo ""
+	echo "Options:"
+	echo " -h, --help"
+	echo "    Print detailed help screen"
+	echo " -a, --api"
+	echo "    URL to your icinga2 api"
+	echo " -u, --user"
+	echo "    Icinga2 api user:password"
+	echo " -H, --hostname"
+	echo "    Icinga2 host object to check status for"
+	echo " -s, --service"
+	echo "    Optional: icinga2 service name to check status for."
+	echo "    If defined status for host!service will be fetched."
+	echo ""
+	echo "Example:"
+	echo ""
+	echo "for a host"
+	echo "./check_icinga2_object --api 'https://icinga:5665' --user 'root:icinga' --hostname icingahost"
+	echo ""
+	echo "or"
+	echo ""
+	echo "for a service"
+	echo "./check_icinga2_object --api 'https://icinga:5665' --user 'root:icinga' --hostname icingahost --service 'Linux disk'"
+	echo ""
+}
+
+# Checking for curl
+CURL=`which curl`
+if [ ! -e $CURL ];
+then
+        echo "curl is missing, please install curl."
+        exit 3
+fi
+
+CURLOPTS='-k -s -H "Accept: application/json"'
+
+# Checking for jq
+JQ=`which jq`
+if [ ! -e $JQ ];
+then
+        echo "jq is missing, please install jq."
+        exit 3
+fi
+
+if [ $# -lt 1 ]; then
+        print_usage
+        exit 3
+fi
+
+while test -n "$1"; do
+    case "$1" in
+        --help)
+            print_usage
+            exit 0
+            ;;
+        -h)
+            print_usage
+            exit 0
+            ;;
+        -a)
+            I2API=$2
+            shift
+            ;;
+        --api)
+            I2API=$2
+            shift
+            ;;
+        -u)
+            I2USER=$2
+            shift
+            ;;
+        --user)
+            I2USER=$2
+            shift
+            ;;
+        -H)
+            I2HOSTNAME=$2
+            shift
+            ;;
+        --hostname)
+            I2HOSTNAME=$2
+            shift
+            ;;
+        -s)
+            I2SERVICE=$2
+            shift
+            ;;
+        --service)
+            I2SERVICE=$2
+            shift
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            print_usage
+            exit 3
+            ;;
+    esac
+    shift
+done
+
+
+if [[ -z "$HOSTNAME" ]]
+then
+        # check that hostname is set
+        echo "Hostname is not set"
+	echo ""
+	print_usage
+	exit 3
+fi
+
+if [[ ${I2SERVICE:+1} ]]
+then
+	# check status for a service object
+	OBJECT=`$CURL $CURLOPTS -u "$I2USER" "$I2API/v1/objects/services?service=$I2HOSTNAME!$I2SERVICE"`
+	OUTPUT=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.output'`
+	PERFDATA=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.performance_data[]' | xargs`
+	STATE=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.exit_status'`
+	echo "Host $I2HOSTNAME, Service $I2SERVICE, $OUTPUT|$PERFDATA"
+	exit $STATE
+else
+	# check status for a host object
+	OBJECT=`$CURL $CURLOPTS -u "$I2USER" "$I2API/v1/objects/hosts?host=$I2HOSTNAME"`
+	OUTPUT=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.output'`
+	PERFDATA=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.performance_data[]' | xargs`
+        STATE=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.exit_status'`
+	echo "Host $I2HOSTNAME, $OUTPUT|$PERFDATA"
+	exit $STATE
+fi
+
