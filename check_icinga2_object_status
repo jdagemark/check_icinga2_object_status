@@ -23,8 +23,8 @@
 
 print_usage() {
 	echo ""
-	echo "Usage: check_icinga2_object.sh --api <icinga2_api_url> --user <apiuser:apipassword> \\"
-	echo "                               -H | --hostname <host.name> --service <service.name>" 
+	echo "Usage: check_icinga2_object --api <icinga2_api_url> --user <apiuser:apipassword> \\"
+	echo "                            -H | --hostname <host.name> --service <service.name>" 
 	echo ""
 	echo "Options:"
 	echo " -h, --help"
