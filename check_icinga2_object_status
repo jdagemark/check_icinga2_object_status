@@ -71,7 +71,7 @@ fi
 
 # Checking for xargs
 XARGS=`which xargs`
-if [ ! - $XARGS ] ;
+if [ ! -e $XARGS ];
 then
 	echo "xargs is missing, please install xargs."
 	exit 3
