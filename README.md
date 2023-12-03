@@ -2,8 +2,8 @@
 Icinga2 plugin to check status on a host / service on another Icinga2 server using the Icinga2 API.
 
 ```
-Usage: check_icinga2_object.sh --api <icinga2_api_url> --user <apiuser:apipassword> -H | --hostname <host.name> \
-                               --service <service.name>
+Usage: check_icinga2_object.sh --api <icinga2_api_url> --user <apiuser:apipassword> \
+                               -H | --hostname <host.name> --service <service.name>
 
 Options:
  -h, --help
