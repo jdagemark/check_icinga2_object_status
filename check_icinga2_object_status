@@ -67,6 +67,14 @@ then
         exit 3
 fi
 
+# Checking for xargs
+XARGS=`which xargs`
+if [ ! - $XARGS ] ;
+then
+	echo "xargs is missing, please install xargs."
+	exit 3
+fi
+
 if [ $# -lt 1 ]; then
         print_usage
         exit 3
