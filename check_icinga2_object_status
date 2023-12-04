@@ -6,24 +6,25 @@
 # Copyright (c) 2023 Dagemark Innovation AB
 # Author: Johannes Dagemark <johannes@dagemark.com>
 #
-# check_icinga2_object is free software: you can redistribute it and/or modify
+# check_icinga2_object_status is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# check_icinga2_object is distributed in the hope that it will be useful,
+# check_icinga2_object_status is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with check_icinga2_object-exporter.  If not, see <http://www.gnu.org/licenses/>.
+# along with check_icinga2_object_status.  If not, see <http://www.gnu.org/licenses/>.
 #
 #
 
 print_usage() {
 	echo ""
-	echo "Usage: check_icinga2_object --api <icinga2_api_url> --user <apiuser:apipassword> \\"
+	echo "Usage:"
+	echo "check_icinga2_object_status --api <icinga2_api_url> --user <apiuser:apipassword> \\"
 	echo "                            -H | --hostname <host.name> --service <service.name>" 
 	echo ""
 	echo "Options:"
@@ -42,12 +43,12 @@ print_usage() {
 	echo "Example:"
 	echo ""
 	echo "for a host"
-	echo "./check_icinga2_object --api 'https://icinga:5665' --user 'root:icinga' --hostname icingahost"
+	echo "./check_icinga2_object_status --api 'https://icinga:5665' --user 'root:icinga' --hostname icingahost"
 	echo ""
 	echo "or"
 	echo ""
 	echo "for a service"
-	echo "./check_icinga2_object --api 'https://icinga:5665' --user 'root:icinga' --hostname icingahost --service 'Linux disk'"
+	echo "./check_icinga2_object_status --api 'https://icinga:5665' --user 'root:icinga' --hostname icingahost --service 'Linux disk'"
 	echo ""
 }
 
