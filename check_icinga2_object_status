@@ -144,22 +144,52 @@ then
 	exit 3
 fi
 
+if [[ -z ${I2SERVICE+x} ]]
+then
+	# urlize hostname
+	I2HOSTNAMEURL=`jq -rn --arg x "$I2HOSTNAME" '$x|@uri'`
+	OBJECT_HOST=`$CURL $CURLOPTS -u "$I2USER" "$I2API/v1/objects/hosts?host=$I2HOSTNAMEURL"`
+fi
+if [[ $OBJECT_HOST == *"404"* ]]
+then
+        #check if object exists
+        echo "HOSTNAME is not correctly set"
+        echo "HOST: $I2HOSTNAMEURL message:  $OBJECT_HOST"
+        print_usage
+        exit 3
+elif [[ $OBJECT_HOST != *"404"* ]]
+then
+        #check status for host
+	OUTPUT_HOST=`echo $OBJECT_HOST | $JQ -r '.results[].attrs.last_check_result.output'`
+	PERFDATA_HOST=`echo $OBJECT_HOST | $JQ -r '.results[].attrs.last_check_result.performance_data[]' | $XARGS`
+	STATE_HOST=`echo $OBJECT_HOST | $JQ -r '.results[].attrs.last_check_result.exit_status'`
+	echo "Host $I2HOSTNAME, $OUTPUT_HOST|$PERFDATA_HOST"
+	exit $STATE_HOST
+fi
+
 if [[ ${I2SERVICE:+1} ]]
 then
-	# check status for a service object
-	OBJECT=`$CURL $CURLOPTS -u "$I2USER" "$I2API/v1/objects/services?service=$I2HOSTNAME!$I2SERVICE"`
-	OUTPUT=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.output'`
-	PERFDATA=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.performance_data[]' | $XARGS`
+	# urlize the service variable 
+	I2SERVICEURL=`jq -rn --arg x "$I2SERVICE" '$x|@uri'`
+	OBJECT=`$CURL $CURLOPTS -u "$I2USER" "$I2API/v1/objects/services?service=$I2HOSTNAME!$I2SERVICEURL"`
+fi
+
+if [[ $OBJECT == *"404"* ]]  || [[ -z ${I2SERVICE} ]]
+then
+        #check if object exists
+        echo "Service is not correctly set"
+        echo "$OBJECT"
+        print_usage
+        exit 3
+
+elif [[ $OBJECT != *"404"* ]]
+then
+        #check status for service object
+	OUTPUT=`echo $OBJECT | $JQ -r  '.results[].attrs.last_check_result.output'`
+	PERFDATA=`echo $OBJECT | $JQ -r  '.results[].attrs.last_check_result.performance_data[]' | $XARGS`
 	STATE=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.exit_status'`
+
 	echo "Host $I2HOSTNAME, Service $I2SERVICE, $OUTPUT|$PERFDATA"
-	exit $STATE
-else
-	# check status for a host object
-	OBJECT=`$CURL $CURLOPTS -u "$I2USER" "$I2API/v1/objects/hosts?host=$I2HOSTNAME"`
-	OUTPUT=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.output'`
-	PERFDATA=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.performance_data[]' | $XARGS`
-        STATE=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.exit_status'`
-	echo "Host $I2HOSTNAME, $OUTPUT|$PERFDATA"
 	exit $STATE
 fi
 
