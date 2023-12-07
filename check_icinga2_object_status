@@ -152,14 +152,14 @@ then
 fi
 if [[ $OBJECT_HOST == *"404"* ]]
 then
-        #check if object exists
+	# check if object exists
         echo "HOSTNAME is not correctly set"
         echo "HOST: $I2HOSTNAMEURL message:  $OBJECT_HOST"
         print_usage
         exit 3
 elif [[ $OBJECT_HOST != *"404"* ]]
 then
-        #check status for host
+	# check status for a host object
 	OUTPUT_HOST=`echo $OBJECT_HOST | $JQ -r '.results[].attrs.last_check_result.output'`
 	PERFDATA_HOST=`echo $OBJECT_HOST | $JQ -r '.results[].attrs.last_check_result.performance_data[]' | $XARGS`
 	STATE_HOST=`echo $OBJECT_HOST | $JQ -r '.results[].attrs.last_check_result.exit_status'`
@@ -184,7 +184,7 @@ then
 
 elif [[ $OBJECT != *"404"* ]]
 then
-        #check status for service object
+       #check status for service object
 	OUTPUT=`echo $OBJECT | $JQ -r  '.results[].attrs.last_check_result.output'`
 	PERFDATA=`echo $OBJECT | $JQ -r  '.results[].attrs.last_check_result.performance_data[]' | $XARGS`
 	STATE=`echo $OBJECT | $JQ -r '.results[].attrs.last_check_result.exit_status'`
